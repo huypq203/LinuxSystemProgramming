@@ -38,3 +38,26 @@ add_data_to_dll (dll_t *dll, void *app_data){
     return 0;
 }
 
+void callback_search_registration(dll_t *dll, int (*match_key)(void const *, void const *))
+{
+    dll->match_key = match_key;
+    return;
+}
+
+void* dll_search_by_key(dll_t const *dll, void const *key)
+{
+    if (!dll || !dll->head)
+        return NULL;
+
+    dll_node_t *node = dll->head;
+
+    while (node)
+    {
+        if (dll->match_key(node->data, key) == 0)
+            return node->data;
+
+        node = node->right;
+    }
+
+    return NULL;
+}

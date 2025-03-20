@@ -112,6 +112,27 @@ search_employee_by_emp_id(dll_t const *employee_db, unsigned int const rollno)
     return NULL;
 }
 
+//Callback function implementation
+int match_student_rec_by_key(void const *data, void const *key)
+{
+    int rollno = *(int *)key;
+
+    if (((student_t *)data)->rollno == rollno)
+        return 0;
+
+    return -1;
+}
+
+int match_employee_rec_by_key(void const *data, void const *key)
+{
+    int emp_id = *(int *)key;
+
+    if (((employee_t *)data)->emp_id == emp_id)
+        return 0;
+
+    return -1;
+}
+
 int 
 main()
 {
@@ -139,7 +160,12 @@ main()
     add_data_to_dll(student_db, student2);
     add_data_to_dll(student_db, student3);
 
-    student_t *student = search_student_by_rollno(student_db, 800400);
+    /* student_t *student = search_student_by_rollno(student_db, 800400); */
+
+    callback_search_registration(student_db, match_student_rec_by_key);
+    int rollno = 800000;
+    student_t *student = (student_t *)dll_search_by_key(student_db, (void *)&rollno); 
+
     if(!student){
         printf("Student record not found\n");
     }
