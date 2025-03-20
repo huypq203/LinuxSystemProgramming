@@ -61,3 +61,52 @@ void* dll_search_by_key(dll_t const *dll, void const *key)
 
     return NULL;
 }
+
+void callback_compare_registration(dll_t *dll, int (*compare)(void const*, void const *))
+{
+    dll->compare = compare;
+    return;
+}
+
+void dll_priority_add_new(dll_t *dll, void *data)
+{
+    if (!dll || !data)
+        return;
+
+    dll_node_t *node = calloc(1, sizeof(dll_node_t));
+    node->left = NULL;
+    node->right = NULL;
+    node->data = data;
+
+    if (!dll->head)
+    {
+        dll->head = node;
+        return;
+    }
+
+    dll_node_t *temp = dll->head;
+    while (1)
+    {
+        if (dll->compare(node->data, temp->data) < 0)
+        {
+            node->right = temp;
+            node->left = temp->left;
+
+            if (temp->left)
+                temp->left->right = node;
+            else
+                dll->head = node;  // Update head if inserted at the beginning
+
+            temp->left = node;
+            return;
+        }
+        
+        if (!temp->right)
+        {
+            temp->right = node;
+            node->left = temp;
+            return;
+        }
+        temp = temp->right;
+    }
+}

@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include "dll.h"
@@ -112,7 +113,7 @@ search_employee_by_emp_id(dll_t const *employee_db, unsigned int const rollno)
     return NULL;
 }
 
-//Callback function implementation
+//Callback search function implementation
 int match_student_rec_by_key(void const *data, void const *key)
 {
     int rollno = *(int *)key;
@@ -131,6 +132,55 @@ int match_employee_rec_by_key(void const *data, void const *key)
         return 0;
 
     return -1;
+}
+
+//Callback comparison function implementation
+int compare_student_record(void const *stud1, void const *stud2)
+{
+    student_t *student1 = (student_t *)stud1;
+    student_t *student2 = (student_t *)stud2;
+
+    if (student1->rollno > student2->rollno)
+        return 1;
+    else if (student1->rollno < student2->rollno)
+        return -1;
+    else if (student1->age > student2->age)
+        return 1;
+    else if (strncmp(student1->name, student2->name, 31) > 0)
+        return 1;
+    else if (strncmp(student1->name, student2->name, 31) < 0)
+        return -1;
+    else if (student1->weight > student2->weight)
+        return 1;
+    else if (student1->weight < student2->weight)
+        return -1;
+
+    assert(0);
+}
+
+int compare_employee_record(void const *empl1, void const *empl2)
+{
+    employee_t *employee1 = (employee_t *)empl1;
+    employee_t *employee2 = (employee_t *)empl2;
+
+    if (employee1->emp_id > employee2->emp_id)
+        return 1;
+    else if (employee1->emp_id < employee2->emp_id)
+        return -1;
+    else if (strncmp(employee1->name, employee2->name, 31) > 0)
+        return 1;
+    else if (strncmp(employee1->name, employee2->name, 31) < 0)
+        return -1;
+    else if (strncmp(employee1->designation, employee2->designation, 31) > 0)
+        return 1;
+    else if (strncmp(employee1->designation, employee2->designation, 31) < 0)
+        return -1;
+    else if (employee1->salary > employee2->salary)
+        return 1;
+    else if (employee1->salary < employee2->salary)
+        return -1;
+
+    assert(0);
 }
 
 int 
@@ -156,22 +206,30 @@ main()
     student3->rollno = 800400;
 
     dll_t *student_db = get_new_dll();
-    add_data_to_dll(student_db, student1);
-    add_data_to_dll(student_db, student2);
-    add_data_to_dll(student_db, student3);
 
-    /* student_t *student = search_student_by_rollno(student_db, 800400); */
+    callback_compare_registration(student_db, compare_student_record);
 
-    callback_search_registration(student_db, match_student_rec_by_key);
-    int rollno = 800000;
-    student_t *student = (student_t *)dll_search_by_key(student_db, (void *)&rollno); 
+    dll_priority_add_new(student_db, (void *)student1);
+    dll_priority_add_new(student_db, (void *)student2);
+    dll_priority_add_new(student_db, (void *)student3);
 
-    if(!student){
-        printf("Student record not found\n");
-    }
-    else{
-        print_student_detail(student);
-    }
+    print_student_db(student_db);
+    /* add_data_to_dll(student_db, student1); */
+    /* add_data_to_dll(student_db, student2); */
+    /* add_data_to_dll(student_db, student3); */
+
+    /* /1* student_t *student = search_student_by_rollno(student_db, 800400); *1/ */
+
+    /* callback_search_registration(student_db, match_student_rec_by_key); */
+    /* int rollno = 800000; */
+    /* student_t *student = (student_t *)dll_search_by_key(student_db, (void *)&rollno); */ 
+
+    /* if(!student){ */
+    /*     printf("Student record not found\n"); */
+    /* } */
+    /* else{ */
+    /*     print_student_detail(student); */
+    /* } */
 
     //Employee database
     employee_t *employee1 = calloc(1, sizeof(employee_t));

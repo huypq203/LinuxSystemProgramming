@@ -9,7 +9,8 @@ typedef struct dll_node_{
 
 typedef struct dll_{
     dll_node_t *head;
-    int (*match_key) (void const *node, void const *key);
+    int (*match_key) (void const *data, void const *key);
+    int (*compare) (void const *data1, void const *data2);
 } dll_t;
 
 
@@ -36,8 +37,14 @@ is_dll_empty (dll_t *dll);
 void
 drain_dll (dll_t *dll);
 
-//Callback function registation
+//Callback search function registation
 void callback_search_registration(dll_t *dll, int (*match_key)(void const*, void const *));
 
 //Generic search function
 void* dll_search_by_key(dll_t const *dll, void const *key);
+
+//Callback compare function registation
+void callback_compare_registration(dll_t *dll, int (*compare)(void const*, void const *));
+
+//Add new node according to the order
+void dll_priority_add_new(dll_t *dll, void *data);
